@@ -20,6 +20,11 @@ def reorder(first_indices, second_indices, values):
     new_order = np.lexsort((second_indices, first_indices))
     return first_indices[new_order], second_indices[new_order], values[new_order]
 
+# Helps organize the print log.
+def prnt(text):
+    print()
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~", text)
+
 class SparseMatrix:
     
     def __init__(self, matrix, tol = 10**-8):
@@ -92,6 +97,33 @@ class SparseMatrix:
                 self.cols[j+1:] += 1
                 self.number_of_nonzero += 1
     
+    def multiply(self, vector):
+        if len(vector.shape) != 1:
+            raise ValueError(f"The input to vector multiplication is not a vector: {vector}")
+        vLen = vector.shape[0]
+        if vLen != self.num_cols:
+            raise ValueError(f"The input vector {vector} does not match the matrix for multiplication.")
+        
+        out = np.zeros(self.num_rows)
+        if self.intern_represent == 'CSR':
+            for i in range(self.num_rows):
+                start, end = self.rows[i], self.rows[i + 1]
+                slLen = end - start
+                vals, inds = self.v[start:end], self.cols[start:end]
+                for j in range(slLen):
+                    out[i] += vals[j] * vector[inds[j]]
+        elif self.intern_represent == 'CSC':
+            for i in range(self.num_cols):
+                start, end = self.cols[i], self.cols[i + 1]
+                slLen = end - start
+                vals, inds = self.v[start:end], self.rows[start:end]
+                vecVal = vector[i]
+                for j in range(slLen):
+                    out[inds[j]] += vals[j] * vecVal
+        else:
+            raise ValueError("Unrecognized internal representation for vector multiplication.")
+        return out
+    
     def describe(self):
         print('==== DESCRIPTION ====')
         print('intern_represent -', self.intern_represent)
@@ -103,17 +135,20 @@ class SparseMatrix:
         print('Number of nonzero values -', self.number_of_nonzero)
         print('=====================')
         
-#EXAMPLE 
+
+prnt("EXAMPLE")
 
 matrix = np.array([[10,20, 0,  0,  0,  0 ],\
                    [0, 30, 0,  40, 0,  0 ],\
                    [0, 0,  50, 60, 70, 0 ],\
                    [0, 0,  0,  0,  0,  80],])
+vector = np.array([5, 2, 7, 10, 6, 3])
 
 sparse_matrix = SparseMatrix(matrix, tol = 10**-5)
 sparse_matrix.describe()
 
-#SOME ARRAY EXAMPLES
+
+prnt("SOME ARRAY EXAMPLES")
 
 print(compress([2, 4, 5, 5, 7, 7, 7, 7, 7, 7, 7, 7], 10, 12))
 print(compress([0, 1, 1, 2, 3, 3, 4, 5], 6, 8))
@@ -123,12 +158,14 @@ print(decompress([0, 0, 0, 1, 1, 2, 4, 4, 12, 12, 12], 10))
 print(decompress([0, 1, 3, 4, 6, 7, 8], 6))
 print(decompress([0, 4, 4, 4, 4, 4], 5))
 
-#SWITCH TO CSC
+
+prnt("SWITCH TO CSC")
 
 sparse_matrix.switch('CSC')
 sparse_matrix.describe()
 
-#THE CHANGE METHOD
+
+prnt("THE CHANGE METHOD")
 
 sparse_matrix.change(0, 0, 15)
 sparse_matrix.change(1, 2, 35)
@@ -138,3 +175,14 @@ sparse_matrix.switch('CSR')
 sparse_matrix.change(2, 1, 45)
 sparse_matrix.change(3, 5, 85)
 sparse_matrix.describe()
+
+
+prnt("VECTOR MULTIPLICATION")
+
+sparse_mult = SparseMatrix(matrix)
+sparse_mult.describe()
+print("Input vector:", vector)
+print("Desired output vector: ", matrix.dot(vector))
+print("Output vector:", sparse_mult.multiply(vector))
+sparse_mult.switch('CSC')
+print("Output using CSC:", sparse_mult.multiply(vector))
