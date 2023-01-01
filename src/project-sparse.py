@@ -96,7 +96,106 @@ class SparseMatrix:
                 self.v = np.insert(self.v, index, value)
                 self.cols[j+1:] += 1
                 self.number_of_nonzero += 1
-    
+                
+                
+       def equals(self, other):
+
+        # FIXME other not of instance SparseMatrix when in CSC
+
+        if isinstance(other, SparseMatrix):
+            if self.intern_represent != other.intern_represent:
+                self.switch(other.intern_represent)
+
+            if np.sum(self != other) == 0:
+                return 1
+            else:
+                return 0
+        else:
+            raise ValueError("Summand not of type SparseMatrix!")
+
+
+    def add(self, other):
+        
+        if isinstance(other, SparseMatrix):
+
+            if self.intern_represent != other.intern_represent:
+                self.switch(other.intern_represent)
+
+            if self.intern_represent == 'CSR':
+
+                #FIXME these lines seem to be controversial
+                other.rows = decompress(other.rows, other.num_rows)
+                self.rows = decompress(self.rows, self.num_rows)
+
+                self.cols, self.rows, self.v = reorder(self.cols, self.rows, self.v)
+                other.cols, other.rows, other.v = reorder(other.cols, other.rows, other.v)
+
+            elif self.intern_represent == 'CSC':
+
+                self.cols = decompress(self.cols, self.num_cols)
+                self.rows, self.cols, self.v = reorder(self.rows, self.cols, self.v)
+
+                other.cols = decompress(other.cols, other.num_cols)
+                other.rows, other.cols, other.v = reorder(other.rows, other.cols, other.v)
+           
+            if self.num_cols == other.num_cols and self.num_rows == other.num_rows:
+                 Sum = self 
+            else:
+                 raise ValueError("Invalid dimensions!")
+
+            # Concatenation takes care of disjoint elements but leaves duplicates
+            np.concatenate((Sum.rows, other.rows))
+            np.concatenate((Sum.cols, other.cols))
+            np.concatenate((Sum.v, other.v))
+
+            Sum.rows, Sum.cols, Sum.v = reorder(Sum.rows, Sum.cols, Sum.v)
+
+
+            # Remove duplicates but add their values
+            coords = np.column_stack((Sum.cols,Sum.rows))
+
+            for i in range(Sum.cols.size-1):
+                if (coords[i] == coords[i+1]).all():
+                    result = Sum.v[i] + Sum.v[i+1]
+                    Sum.rows.pop(i)
+                    Sum.cols.pop(i)
+                    Sum.v.pop(i)
+                    Sum.v[i+1] = result
+
+            if self.intern_represent == 'CSR':
+                Sum.cols = compress(Sum.cols, Sum.num_cols, Sum.number_of_nonzero)
+            else:
+                Sum.rows = compress(Sum.rows, Sum.num_rows, Sum.number_of_nonzero)
+        return Sum
+
+
+    def multiply(self, vector):
+        if len(vector.shape) != 1:
+            raise ValueError(f"The input to vector multiplication is not a vector: {vector}")
+        vLen = vector.shape[0]
+        if vLen != self.num_cols:
+            raise ValueError(f"The input vector {vector} does not match the matrix for multiplication.")
+        
+        out = np.zeros(self.num_rows)
+        if self.intern_represent == 'CSR':
+            for i in range(self.num_rows):
+                start, end = self.rows[i], self.rows[i + 1]
+                slLen = end - start
+                vals, inds = self.v[start:end], self.cols[start:end]
+                for j in range(slLen):
+                    out[i] += vals[j] * vector[inds[j]]
+        elif self.intern_represent == 'CSC':
+            for i in range(self.num_cols):
+                start, end = self.cols[i], self.cols[i + 1]
+                slLen = end - start
+                vals, inds = self.v[start:end], self.rows[start:end]
+                vecVal = vector[i]
+                for j in range(slLen):
+                    out[inds[j]] += vals[j] * vecVal
+        else:
+            raise ValueError("Unrecognized internal representation for vector multiplication.")
+        return out
+ 
     def multiply(self, vector):
         if len(vector.shape) != 1:
             raise ValueError(f"The input to vector multiplication is not a vector: {vector}")
