@@ -1,5 +1,6 @@
 #%% -*- coding: utf-8 -*-
 
+import copy
 from matplotlib.pyplot import *
 import numpy as np
 
@@ -98,10 +99,8 @@ class SparseMatrix:
                 self.number_of_nonzero += 1
                 
                 
-       def equals(self, other):
-
-        # FIXME other not of instance SparseMatrix when in CSC
-
+      def equals(self, other):
+		
         if isinstance(other, SparseMatrix):
             if self.intern_represent != other.intern_represent:
                 self.switch(other.intern_represent)
@@ -116,57 +115,62 @@ class SparseMatrix:
 
     def add(self, other):
         
-        if isinstance(other, SparseMatrix):
+        if not isinstance(other, SparseMatrix):
+            raise ValueError("other must be of type SparseMatrix!")
+            
+        if not (self.num_cols == other.num_cols and self.num_rows == other.num_rows):
+                raise ValueError("Invalid dimensions!")
 
-            if self.intern_represent != other.intern_represent:
-                self.switch(other.intern_represent)
+        Sum = copy.copy(self)
+        Term = copy.copy(other)
 
-            if self.intern_represent == 'CSR':
+        if Sum.intern_represent != Term.intern_represent:
+            Sum.switch(Term.intern_represent)
 
-                #FIXME these lines seem to be controversial
-                other.rows = decompress(other.rows, other.num_rows)
-                self.rows = decompress(self.rows, self.num_rows)
+        if Sum.intern_represent == 'CSR':
 
-                self.cols, self.rows, self.v = reorder(self.cols, self.rows, self.v)
-                other.cols, other.rows, other.v = reorder(other.cols, other.rows, other.v)
+            Term.rows = decompress(Term.rows, Term.num_rows)
+            Term.cols, Term.rows, Term.v = reorder(Term.cols, Term.rows, Term.v)
+                
+            Sum.rows = decompress(Sum.rows, Sum.num_rows)
+            Sum.cols, Sum.rows, Sum.v = reorder(Sum.cols, Sum.rows, Sum.v)
+                
+        else:
 
-            elif self.intern_represent == 'CSC':
-
-                self.cols = decompress(self.cols, self.num_cols)
-                self.rows, self.cols, self.v = reorder(self.rows, self.cols, self.v)
-
-                other.cols = decompress(other.cols, other.num_cols)
-                other.rows, other.cols, other.v = reorder(other.rows, other.cols, other.v)
-           
-            if self.num_cols == other.num_cols and self.num_rows == other.num_rows:
-                 Sum = self 
-            else:
-                 raise ValueError("Invalid dimensions!")
-
-            # Concatenation takes care of disjoint elements but leaves duplicates
-            np.concatenate((Sum.rows, other.rows))
-            np.concatenate((Sum.cols, other.cols))
-            np.concatenate((Sum.v, other.v))
-
+            Sum.cols = decompress(Sum.cols, Sum.num_cols)
             Sum.rows, Sum.cols, Sum.v = reorder(Sum.rows, Sum.cols, Sum.v)
 
+            Term.cols = decompress(Term.cols, Term.num_cols)
+            Term.rows, Term.cols, Term.v = reorder(Term.rows, Term.cols, Term.v)
+     
+        Sum.rows = np.concatenate((Sum.rows, Term.rows))
+        Sum.cols = np.concatenate((Sum.cols, Term.cols))
+        Sum.v = np.concatenate((Sum.v, Term.v))
+        Sum.rows, Sum.cols, Sum.v = reorder(Sum.rows, Sum.cols, Sum.v)
+    
+        coords = np.column_stack((Sum.cols,Sum.rows))
+        i = -1
+		
+        while i < len(Sum.rows) -2:
+            i+=1
+            if (coords[i] == coords[i+1]).all():
+                coords = np.delete(coords, i, axis=0)
+                result = Sum.v[i] + Sum.v[i+1]
+                Sum.rows = np.delete(Sum.rows, i)
+                Sum.cols = np.delete(Sum.cols, i)
+                Sum.v = np.delete(Sum.v, i)
+                Sum.v[i] = result
+                i -= 1
 
-            # Remove duplicates but add their values
-            coords = np.column_stack((Sum.cols,Sum.rows))
-
-            for i in range(Sum.cols.size-1):
-                if (coords[i] == coords[i+1]).all():
-                    result = Sum.v[i] + Sum.v[i+1]
-                    Sum.rows.pop(i)
-                    Sum.cols.pop(i)
-                    Sum.v.pop(i)
-                    Sum.v[i+1] = result
-
-            if self.intern_represent == 'CSR':
-                Sum.cols = compress(Sum.cols, Sum.num_cols, Sum.number_of_nonzero)
-            else:
-                Sum.rows = compress(Sum.rows, Sum.num_rows, Sum.number_of_nonzero)
+        Sum.number_of_nonzero = len(coords)        
+        if Sum.intern_represent == 'CSC':
+            Sum.cols = compress(Sum.cols, Sum.num_cols, Sum.number_of_nonzero)
+        else:
+            Sum.rows = compress(Sum.rows, Sum.num_rows, Sum.number_of_nonzero)
         return Sum
+
+
+ 
 
 
     def multiply(self, vector):
@@ -285,3 +289,24 @@ print("Desired output vector: ", matrix.dot(vector))
 print("Output vector:", sparse_mult.multiply(vector))
 sparse_mult.switch('CSC')
 print("Output using CSC:", sparse_mult.multiply(vector))
+
+
+prnt("VECTOR ADDITION")
+matrix2 = np.array([[10,20, 0,  0,  0,  -1 ],\
+                   [0, 30, 0,  0, 0,  0 ],\
+                   [0, 0,  50, 60, 70, 0 ],\
+                   [0, 100,  0,  0,  0,  80],])
+sparse_matrix2 = SparseMatrix(matrix2, tol = 10**-5)
+
+print("First summand")
+sparse_matrix.describe()
+print("Second summand")
+sparse_matrix2.describe()
+
+sparse_matrix3 = SparseMatrix(matrix + matrix2, tol = 10**-5)
+print("Sum of matrices")
+(sparse_matrix.add(sparse_matrix2)).describe()
+print("Expected output")
+sparse_matrix3.describe()
+
+
