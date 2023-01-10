@@ -3,6 +3,7 @@
 import copy
 from matplotlib.pyplot import *
 import numpy as np
+import timeit as ti
 
 # These three functions are used heavily in the switch method,
 # and are hopefully useful for the addition method as well
@@ -281,4 +282,4 @@ print("Sum of matrices")
 print("Expected output")
 sparse_matrix3.describe()
 
-
+prnt("PERFORMANCE")
