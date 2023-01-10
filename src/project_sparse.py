@@ -105,7 +105,7 @@ class SparseMatrix:
     def equals(self, other):
 		
         if isinstance(other, SparseMatrix):
-	    new = copy.copy(self)
+            new = copy.copy(self)
             if self.intern_represent != other.intern_represent:
                 new.switch(other.intern_represent)
 
