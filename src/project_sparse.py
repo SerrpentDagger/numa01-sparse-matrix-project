@@ -3,7 +3,16 @@
 import copy
 from matplotlib.pyplot import *
 import numpy as np
-import timeit as ti
+import random
+
+def randmatrix(approximate_sparsity, num_rows, num_cols):
+    matrix = np.zeros(shape=[num_rows, num_cols])
+    for i in range(num_rows):
+        for j in range(num_cols):
+            num = random.random()
+            if num > approximate_sparsity:
+                matrix[i,j] = random.randint(1,1000000)
+    return matrix
 
 # These three functions are used heavily in the switch method,
 # and are hopefully useful for the addition method as well
