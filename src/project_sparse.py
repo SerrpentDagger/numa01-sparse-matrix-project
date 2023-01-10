@@ -1,7 +1,6 @@
 #%% -*- coding: utf-8 -*-
 
 import copy
-from matplotlib.pyplot import *
 import numpy as np
 import random
 
@@ -28,7 +27,7 @@ def randmatrix(approximate_sparsity, num_rows, num_cols):
     for i in range(num_rows):
         for j in range(num_cols):
             num = random.random()
-            if num > approximate_sparsity:
+            if num < approximate_sparsity:
                 matrix[i,j] = random.randint(1,1000000)
     return matrix
 
@@ -154,8 +153,6 @@ class SparseMatrix:
             self.v.extend(r[nonzero_cols])
             self.rows.append(len(self.cols))
 
-        # This is a quick and probably bad fix for something I forgot to mention,
-        # we assumed in the meeting that these three should be of type np.array
         self.v, self.cols, self.rows = np.array(self.v), np.array(self.cols), np.array(self.rows)    
        
         self.number_of_nonzero = len(self.cols)
@@ -644,11 +641,4 @@ toe = SparseMatrix.toeplitz(10)
 toe.describe()
 toe = SparseMatrix.toeplitz(100)
 toe = SparseMatrix.toeplitz(10000)
-toe.describe()
-
-prnt("PERFORMANCE")
-
-toe = SparseMatrix.toeplitz(3)
-toe.change(1,0,"nail")
-toe.show()
 toe.describe()
