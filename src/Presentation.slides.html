@@ -50,6 +50,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
 .highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
 .highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
 .highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
 .highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
 .highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
@@ -14495,6 +14496,9 @@ a.anchor-link {
 .reveal {
   font-size: 160%;
 }
+.reveal table {
+  font-size: var(--jp-ui-font-size1);
+}
 .reveal pre {
   width: inherit;
   padding: 0.4em;
@@ -14538,6 +14542,23 @@ div.jp-OutputPrompt {
   margin: 5px 5px 0 0;
 }
 
+.reveal div.highlight {
+  margin: 0;
+}
+
+.reveal div.highlight > pre {
+  margin: 0;
+  width: 100%;
+  font-size: var(--jp-code-font-size);
+}
+
+.reveal div.jp-OutputArea-output > pre {
+  margin: 0;
+  width: 90%;
+  font-size: var(--jp-code-font-size);
+  box-shadow: none;
+}
+
 /* Reveal navigation controls */
 
 .reveal .controls .navigate-left,
@@ -14578,17 +14599,14 @@ div.jp-OutputPrompt {
 
 /* Scrollbars */
 
-::-webkit-scrollbar
-{
+::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-::-webkit-scrollbar *
-{
-  background:transparent;
+::-webkit-scrollbar * {
+  background: transparent;
 }
-::-webkit-scrollbar-thumb
-{
+::-webkit-scrollbar-thumb {
   background: #727272 !important;
 }
 </style>
@@ -14615,12 +14633,12 @@ div.jp-OutputPrompt {
                 },
                 displayAlign: 'center',
                 CommonHTML: {
-                    linebreaks: { 
-                    automatic: true 
+                    linebreaks: {
+                    automatic: true
                     }
                 }
             });
-        
+
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
     }
@@ -14634,7 +14652,7 @@ div.jp-OutputPrompt {
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 
 <div class="reveal">
-<div class="slides"><section><section>
+<div class="slides"><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14650,322 +14668,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">project_sparse</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EXAMPLE
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [10 20 30 40 50 60 70 80]
-col_index - [0 1 1 3 2 3 4 5]
-row_index - [0 2 4 7 8]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 8
-=====================
-[[10. 20.  0.  0.  0.  0.]
- [ 0. 30.  0. 40.  0.  0.]
- [ 0.  0. 50. 60. 70.  0.]
- [ 0.  0.  0.  0.  0. 80.]]
-[[10. 20.  0.  0.  0.  0.]
- [ 0. 30.  0. 40.  0.  0.]
- [ 0.  0. 50. 60. 70.  0.]
- [ 0.  0.  0.  0.  0. 80.]]
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SOME ARRAY EXAMPLES
-[ 0  0  0  1  1  2  4  4 12 12 12]
-[0 1 3 4 6 7 8]
-[0 4 4 4 4 4]
-[2 4 5 5 7 7 7 7 7 7 7 7]
-[0 1 1 2 3 3 4 5]
-[0 0 0 0]
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SWITCH TO CSC
-==== DESCRIPTION ====
-intern_represent - CSC
-V (value) - [10 20 30 50 40 60 70 80]
-col_index - [0 1 3 4 6 7 8]
-row_index - [0 0 1 2 1 2 2 3]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 8
-=====================
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ THE CHANGE METHOD
-==== DESCRIPTION ====
-intern_represent - CSC
-V (value) - [15 20 30 35 50 40 60 70 80]
-col_index - [0 1 3 5 7 8 9]
-row_index - [0 0 1 1 2 1 2 2 3]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 9
-=====================
-==== DESCRIPTION ====
-intern_represent - CSC
-V (value) - [20 30 35 50 40 60 70 80]
-col_index - [0 0 2 4 6 7 8]
-row_index - [0 1 1 2 1 2 2 3]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 8
-=====================
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [20 30 35 40 45 50 60 70 85]
-col_index - [1 1 2 3 1 2 3 4 5]
-row_index - [0 1 4 8 9]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 9
-=====================
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [20 30 35 40 50 60 70 85]
-col_index - [1 1 2 3 2 3 4 5]
-row_index - [0 1 4 7 8]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 8
-=====================
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [20 30 35 40 50 60 70 85]
-col_index - [1 1 2 3 2 3 4 5]
-row_index - [0 1 4 7 8]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 8
-=====================
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ VECTOR MULTIPLICATION
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [10 20 30 40 50 60 70 80]
-col_index - [0 1 1 3 2 3 4 5]
-row_index - [0 2 4 7 8]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 8
-=====================
-Input vector: [ 5  2  7 10  6  3]
-Desired output vector:  [  90  460 1370  240]
-Output vector: [  90.  460. 1370.  240.]
-Output using CSC: [  90.  460. 1370.  240.]
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MATRIX ADDITION
-First summand
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [20 30 35 40 50 60 70 85]
-col_index - [1 1 2 3 2 3 4 5]
-row_index - [0 1 4 7 8]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 8
-=====================
-Second summand
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [ 10  20  -1  30  50  60  70 100  80]
-col_index - [0 1 5 1 2 3 4 1 5]
-row_index - [0 3 4 7 9]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 9
-=====================
-Sum of matrices
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [ 10  40  -1  60  35  40 100 120 140 100 165]
-col_index - [0 1 5 1 2 3 2 3 4 1 5]
-row_index - [ 0  3  6  9 11]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 11
-=====================
-Expected output
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [ 20  40  -1  60  40 100 120 140 100 160]
-col_index - [0 1 5 1 3 2 3 4 1 5]
-row_index - [ 0  3  5  8 10]
-Number of rows - 4
-Number of columns - 6
-Number of nonzero values - 10
-=====================
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TOLERANCE ADDITION
-First tolerance summand
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [1 1 2]
-col_index - [0 2 1]
-row_index - [0 2 2 3]
-Number of rows - 3
-Number of columns - 3
-Number of nonzero values - 3
-=====================
-Second tolerance summand
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [-1 -2]
-col_index - [0 1]
-row_index - [0 1 1 2]
-Number of rows - 3
-Number of columns - 3
-Number of nonzero values - 2
-=====================
-Sum of matrices
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [1]
-col_index - [2]
-row_index - [0 1 1 1]
-Number of rows - 3
-Number of columns - 3
-Number of nonzero values - 1
-=====================
-Expected output
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [1]
-col_index - [2]
-row_index - [0 1 1 1]
-Number of rows - 3
-Number of columns - 3
-Number of nonzero values - 1
-=====================
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EMTPY ADDITION
-Empty summand
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - []
-col_index - []
-row_index - [0 0 0 0]
-Number of rows - 3
-Number of columns - 3
-Number of nonzero values - 0
-=====================
-Sum of empty
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - []
-col_index - []
-row_index - [0 0 0 0]
-Number of rows - 3
-Number of columns - 3
-Number of nonzero values - 0
-=====================
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TOEPLITZ
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [ 2 -1 -1  2 -1 -1  2 -1 -1  2]
-col_index - [0 1 0 1 2 1 2 3 2 3]
-row_index - [ 0  2  5  8 10]
-Number of rows - 4
-Number of columns - 4
-Number of nonzero values - 10
-=====================
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [ 2 -1 -1  2]
-col_index - [0 1 0 1]
-row_index - [0 2 4]
-Number of rows - 2
-Number of columns - 2
-Number of nonzero values - 4
-=====================
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [2]
-col_index - [0]
-row_index - [0, 1]
-Number of rows - 1
-Number of columns - 1
-Number of nonzero values - 1
-=====================
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - []
-col_index - []
-row_index - []
-Number of rows - 0
-Number of columns - 0
-Number of nonzero values - 0
-=====================
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [ 4 -2 -2  4 -2 -2  4 -2 -2  4]
-col_index - [0 1 0 1 2 1 2 3 2 3]
-row_index - [ 0  2  5  8 10]
-Number of rows - 4
-Number of columns - 4
-Number of nonzero values - 10
-=====================
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TASK 10
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [ 2 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1
-  2 -1 -1  2]
-col_index - [0 1 0 1 2 1 2 3 2 3 4 3 4 5 4 5 6 5 6 7 6 7 8 7 8 9 8 9]
-row_index - [ 0  2  5  8 11 14 17 20 23 26 28]
-Number of rows - 10
-Number of columns - 10
-Number of nonzero values - 28
-=====================
-==== DESCRIPTION ====
-intern_represent - CSR
-V (value) - [ 2 -1 -1 ... -1 -1  2]
-col_index - [   0    1    0 ... 9999 9998 9999]
-row_index - [    0     2     5 ... 29993 29996 29998]
-Number of rows - 10000
-Number of columns - 10000
-Number of nonzero values - 29998
-=====================
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PERFORMANCE
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15003,7 +14706,7 @@ Number of nonzero values - 29998
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15045,9 +14748,7 @@ Number of nonzero values - 29998
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-
 <div class="jp-OutputArea-child">
-
     
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
@@ -15074,7 +14775,7 @@ Number of nonzero values - 8
 
 </div>
 
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15099,7 +14800,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15138,9 +14839,7 @@ Number of nonzero values - 8
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-
 <div class="jp-OutputArea-child">
-
     
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
@@ -15160,7 +14859,7 @@ Number of nonzero values - 8
 
 </div>
 
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15184,7 +14883,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15219,9 +14918,7 @@ Number of nonzero values - 8
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-
 <div class="jp-OutputArea-child">
-
     
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
@@ -15248,7 +14945,7 @@ Number of nonzero values - 8
 
 </div>
 
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15291,7 +14988,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15337,9 +15034,7 @@ Number of nonzero values - 8
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-
 <div class="jp-OutputArea-child">
-
     
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
@@ -15398,7 +15093,7 @@ Number of nonzero values - 8
 
 </div>
 
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15423,7 +15118,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15467,7 +15162,7 @@ Number of nonzero values - 8
 
         <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">Sum</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span><span class="n">Sum</span><span class="o">.</span><span class="n">rows</span><span class="p">))</span>
         <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-
+    	
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">Sum</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span>
             <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
@@ -15490,7 +15185,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15568,9 +15263,7 @@ Number of nonzero values - 8
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-
 <div class="jp-OutputArea-child">
-
     
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
@@ -15690,7 +15383,7 @@ Number of nonzero values - 0
 
 </div>
 
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15728,7 +15421,7 @@ Number of nonzero values - 0
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15767,9 +15460,7 @@ Number of nonzero values - 0
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-
 <div class="jp-OutputArea-child">
-
     
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
@@ -15796,7 +15487,7 @@ Output using CSC: [  90.  460. 1370.  240.]
 
 </div>
 
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15841,7 +15532,7 @@ Output using CSC: [  90.  460. 1370.  240.]
 </div>
 </div>
 </div>
-</div></section></section><section><section>
+</div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15890,9 +15581,7 @@ Output using CSC: [  90.  460. 1370.  240.]
 
 
 <div class="jp-OutputArea jp-Cell-outputArea">
-
 <div class="jp-OutputArea-child">
-
     
     <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 
