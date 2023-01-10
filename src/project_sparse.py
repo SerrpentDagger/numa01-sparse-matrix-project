@@ -29,8 +29,9 @@ def prnt(text):
 
 class SparseMatrix:
     
-    def __init__(self, matrix, tol = 10**-8):
+    def __init__(self, matrix, tol = 10e-8):
         self.intern_represent = 'CSR'
+        self.tol = tol
         
         matrix[np.abs(matrix) < tol] = 0
         
@@ -59,6 +60,7 @@ class SparseMatrix:
         toe = SparseMatrix(np.array([[]]))
         toe.num_rows = n
         toe.num_cols = n
+        toe.tol = 10e-8
         
         toe.number_of_nonzero = 3*n - 2 if n > 0 else 0
         toe.v = np.array(([2, -1, -1] * n)[:-2])
@@ -102,29 +104,35 @@ class SparseMatrix:
         if i >= self.num_rows or j >= self.num_cols:
             raise IndexError("position out of bounds")
 
+        nonZero = abs(value) >= self.tol
         if self.intern_represent == 'CSR':
             index = np.searchsorted(self.cols[self.rows[i]:self.rows[i+1]], j) + self.rows[i]
-            try:
-                # The reason for the try-except is that self.cols[index]
-                # doesn't exist if index == self.number_of_nonzero
-                if self.cols[index] == j and index != self.rows[i+1]:
+            # The reason for the try-except is that self.cols[index]
+            # doesn't exist if index == self.number_of_nonzero
+            if j < len(self.cols) and self.cols[index] == j and index != self.rows[i+1]:
+                if nonZero:
                     self.v[index] = value
                 else:
-                    raise Exception
-            except:
+                    self.cols = np.delete(self.cols, index)
+                    self.v = np.delete(self.v, index)
+                    self.rows[i+1:] -= 1
+                    self.number_of_nonzero -= 1
+            elif nonZero:
                 self.cols = np.insert(self.cols, index, j)
                 self.v = np.insert(self.v, index, value)
                 self.rows[i+1:] += 1
                 self.number_of_nonzero += 1
-
         elif self.intern_represent == 'CSC':
             index = np.searchsorted(self.rows[self.cols[j]:self.cols[j+1]], i) + self.cols[j]
-            try:
-                if self.rows[index] == i and index != self.cols[j+1]:
+            if i < len(self.rows) and self.rows[index] == i and index != self.cols[j+1]:
+                if nonZero:
                     self.v[index] = value
                 else:
-                    raise Exception
-            except:
+                    self.rows = np.delete(self.rows, index)
+                    self.v = np.delete(self.v, index)
+                    self.cols[j+1:] -= 1
+                    self.number_of_nonzero -= 1
+            elif nonZero:
                 self.rows = np.insert(self.rows, index, i)
                 self.v = np.insert(self.v, index, value)
                 self.cols[j+1:] += 1
@@ -192,7 +200,13 @@ class SparseMatrix:
                 Sum.rows = np.delete(Sum.rows, i)
                 Sum.cols = np.delete(Sum.cols, i)
                 Sum.v = np.delete(Sum.v, i)
-                Sum.v[i] = result
+                if abs(result) >= self.tol:
+                    Sum.v[i] = result
+                else:
+                    Sum.rows = np.delete(Sum.rows, i)
+                    Sum.cols = np.delete(Sum.cols, i)
+                    Sum.v = np.delete(Sum.v, i)
+                    coords = np.delete(coords, i, axis=0)
                 i -= 1
 
         Sum.number_of_nonzero = len(coords)        
@@ -276,10 +290,16 @@ prnt("THE CHANGE METHOD")
 sparse_matrix.change(0, 0, 15)
 sparse_matrix.change(1, 2, 35)
 sparse_matrix.describe()
+sparse_matrix.change(0, 0, 0)
+sparse_matrix.describe()
 
 sparse_matrix.switch('CSR')
 sparse_matrix.change(2, 1, 45)
 sparse_matrix.change(3, 5, 85)
+sparse_matrix.describe()
+sparse_matrix.change(2, 1, 0)
+sparse_matrix.describe()
+sparse_matrix.change(1, 0, 0)
 sparse_matrix.describe()
 
 
@@ -294,8 +314,8 @@ sparse_mult.switch('CSC')
 print("Output using CSC:", sparse_mult.multiply(vector))
 
 
-prnt("VECTOR ADDITION")
-matrix2 = np.array([[10,20, 0,  0,  0,  -1 ],\
+prnt("MATRIX ADDITION")
+matrix2 = np.array([[10,20, 0,  0,  0,  -1  ],\
                    [0, 30, 0,  0, 0,  0 ],\
                    [0, 0,  50, 60, 70, 0 ],\
                    [0, 100,  0,  0,  0,  80],])
@@ -311,6 +331,35 @@ print("Sum of matrices")
 (sparse_matrix.add(sparse_matrix2)).describe()
 print("Expected output")
 sparse_matrix3.describe()
+
+prnt("TOLERANCE ADDITION")
+matrix3 = np.array([[1, 0, 1],
+                    [0, 0, 0],
+                    [0, 2, 0]])
+matrix4 = np.array([[-1, 0, 0],
+                    [0, 0, 0],
+                    [0, -2, 0]])
+spMat3 = SparseMatrix(matrix3)
+print("First tolerance summand")
+spMat3.describe()
+
+spMat4 = SparseMatrix(matrix4)
+print("Second tolerance summand")
+spMat4.describe()
+print("Sum of matrices")
+spMat3.add(spMat4).describe()
+print("Expected output")
+SparseMatrix(matrix3 + matrix4).describe()
+
+prnt("EMTPY ADDITION")
+matrix5 = np.array([[0, 0, 0],
+                    [0, 0, 0],
+                    [0, 0, 0]])
+spMat5 = SparseMatrix(matrix5)
+print("Empty summand")
+spMat5.describe()
+print("Sum of empty")
+spMat5.add(spMat5).describe()
 
 prnt("TOEPLITZ")
 toe = SparseMatrix.toeplitz(4)
@@ -329,6 +378,5 @@ toe.describe()
 toe = SparseMatrix.toeplitz(100)
 toe = SparseMatrix.toeplitz(10000)
 toe.describe()
-
 
 prnt("PERFORMANCE")
