@@ -105,10 +105,11 @@ class SparseMatrix:
     def equals(self, other):
 		
         if isinstance(other, SparseMatrix):
+	    new = copy.copy(self)
             if self.intern_represent != other.intern_represent:
-                self.switch(other.intern_represent)
+                new.switch(other.intern_represent)
 
-            if np.sum(self != other) == 0:
+            if np.sum(new != other) == 0:
                 return 1
             else:
                 return 0
