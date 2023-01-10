@@ -148,6 +148,28 @@ class SparseMatrix:
         self.intern_represent = new_represent
         
     def change(self, i, j, value):
+        """
+        
+
+        Parameters
+        ----------
+        i : index
+            Input index representing rows.
+        j : index
+            Input index representing columns.
+        value : index
+            Input index representing a value.
+
+        Raises
+        ------
+        IndexError
+            This error is raised when the position is out of bounds.
+
+        Returns
+        -------
+        None.
+
+        """
         if i >= self.num_rows or j >= self.num_cols:
             raise IndexError("position out of bounds")
 
