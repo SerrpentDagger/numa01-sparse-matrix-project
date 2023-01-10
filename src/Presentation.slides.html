@@ -14701,7 +14701,7 @@ div.jp-OutputPrompt {
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14792,7 +14792,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14878,7 +14878,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -14991,7 +14991,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15103,23 +15103,79 @@ Number of nonzero values - 8
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Equality">Equality<a class="anchor-link" href="#Equality">&#182;</a></h1><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">equals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SparseMatrix</span><span class="p">):</span>
+<h1 id="Equality">Equality<a class="anchor-link" href="#Equality">&#182;</a></h1><div class="highlight"><pre><span></span><span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">SparseMatrix</span><span class="p">):</span>
             <span class="n">new</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">intern_represent</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">intern_represent</span><span class="p">:</span>
                 <span class="n">new</span><span class="o">.</span><span class="n">switch</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">intern_represent</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">new</span> <span class="o">!=</span> <span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="mi">0</span>
+            <span class="c1"># Only the last line of this check is necessary, but the first two</span>
+            <span class="c1"># provide a large performance boost in most cases.</span>
+            <span class="k">return</span> <span class="n">new</span><span class="o">.</span><span class="n">number_of_nonzero</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">number_of_nonzero</span> <span class="ow">and</span> \
+                <span class="n">new</span><span class="o">.</span><span class="n">num_rows</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">num_rows</span> <span class="ow">and</span> <span class="n">new</span><span class="o">.</span><span class="n">num_cols</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">num_cols</span> <span class="ow">and</span> \
+                <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">v</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">cols</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">cols</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">rows</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Summand not of type SparseMatrix!&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Other for equals comparison is not of type SparseMatrix!&quot;</span><span class="p">)</span>
 </pre></div>
 
 </div>
 </div>
 </div>
+</div></section><section >
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h2 id="Testing">Testing<a class="anchor-link" href="#Testing">&#182;</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">matrixE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+                    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="n">matrixE2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                     <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+                     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">SparseMatrix</span><span class="p">(</span><span class="n">matrixE</span><span class="p">)</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">SparseMatrix</span><span class="p">(</span><span class="n">matrixE</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">SparseMatrix</span><span class="p">(</span><span class="n">matrixE</span><span class="p">)</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">SparseMatrix</span><span class="p">(</span><span class="n">matrixE2</span><span class="p">)))</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>True
+False
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
 </div></section></section><section ><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
@@ -15192,7 +15248,7 @@ Number of nonzero values - 8
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15208,7 +15264,7 @@ Number of nonzero values - 8
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">prnt</span><span class="p">(</span><span class="s2">&quot;MATRIX ADDITION&quot;</span><span class="p">)</span>
@@ -15428,7 +15484,7 @@ Number of nonzero values - 0
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15444,7 +15500,7 @@ Number of nonzero values - 0
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">sparse_mult</span> <span class="o">=</span> <span class="n">SparseMatrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
@@ -15543,7 +15599,7 @@ Output using CSC: [  90.  460. 1370.  240.]
 </div>
 </div>
 </div>
-</div></section></section><section ><section >
+</div></section><section >
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -15559,11 +15615,12 @@ Output using CSC: [  90.  460. 1370.  240.]
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">toe</span> <span class="o">=</span> <span class="n">SparseMatrix</span><span class="o">.</span><span class="n">toeplitz</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">toe</span> <span class="o">=</span> <span class="n">SparseMatrix</span><span class="o">.</span><span class="n">toeplitz</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
 <span class="n">toe</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="n">toe</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 <span class="n">toe</span> <span class="o">=</span> <span class="n">SparseMatrix</span><span class="o">.</span><span class="n">toeplitz</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">toe</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 <span class="n">toe</span> <span class="o">=</span> <span class="n">SparseMatrix</span><span class="o">.</span><span class="n">toeplitz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -15575,6 +15632,7 @@ Output using CSC: [  90.  460. 1370.  240.]
 <span class="n">toe</span> <span class="o">=</span> <span class="n">SparseMatrix</span><span class="o">.</span><span class="n">toeplitz</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">toe</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 <span class="n">toe</span> <span class="o">=</span> <span class="n">SparseMatrix</span><span class="o">.</span><span class="n">toeplitz</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="c1">#toe.describe()</span>
 <span class="n">toe</span> <span class="o">=</span> <span class="n">SparseMatrix</span><span class="o">.</span><span class="n">toeplitz</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
 <span class="n">toe</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 </pre></div>
@@ -15598,13 +15656,20 @@ Output using CSC: [  90.  460. 1370.  240.]
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>==== DESCRIPTION ====
 intern_represent - CSR
-V (value) - [ 2 -1 -1  2 -1 -1  2 -1 -1  2]
-col_index - [0 1 0 1 2 1 2 3 2 3]
-row_index - [ 0  2  5  8 10]
-Number of rows - 4
-Number of columns - 4
-Number of nonzero values - 10
+V (value) - [ 2 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1  2]
+col_index - [0 1 0 1 2 1 2 3 2 3 4 3 4 5 4 5 6 5 6]
+row_index - [ 0  2  5  8 11 14 17 19]
+Number of rows - 7
+Number of columns - 7
+Number of nonzero values - 19
 =====================
+[[ 2. -1.  0.  0.  0.  0.  0.]
+ [-1.  2. -1.  0.  0.  0.  0.]
+ [ 0. -1.  2. -1.  0.  0.  0.]
+ [ 0.  0. -1.  2. -1.  0.  0.]
+ [ 0.  0.  0. -1.  2. -1.  0.]
+ [ 0.  0.  0.  0. -1.  2. -1.]
+ [ 0.  0.  0.  0.  0. -1.  2.]]
 ==== DESCRIPTION ====
 intern_represent - CSR
 V (value) - [ 2 -1 -1  2]
@@ -15682,22 +15747,6 @@ Number of nonzero values - 29998
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
 </div></section></section>
 </div>
 </div>
