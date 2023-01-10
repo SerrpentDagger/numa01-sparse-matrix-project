@@ -34,8 +34,6 @@ class SparseMatrix:
         
         matrix[np.abs(matrix) < tol] = 0
         
-        self.number_of_nonzero = np.count_nonzero(self.matrix)
-        
         self.v, self.cols, self.rows = [], [], [0]
         
         for r in matrix:
@@ -99,7 +97,7 @@ class SparseMatrix:
                 self.number_of_nonzero += 1
                 
                 
-      def equals(self, other):
+    def equals(self, other):
 		
         if isinstance(other, SparseMatrix):
             if self.intern_represent != other.intern_represent:
@@ -168,38 +166,8 @@ class SparseMatrix:
         else:
             Sum.rows = compress(Sum.rows, Sum.num_rows, Sum.number_of_nonzero)
         return Sum
+    
 
-
- 
-
-
-    def multiply(self, vector):
-        if len(vector.shape) != 1:
-            raise ValueError(f"The input to vector multiplication is not a vector: {vector}")
-        vLen = vector.shape[0]
-        if vLen != self.num_cols:
-            raise ValueError(f"The input vector {vector} does not match the matrix for multiplication.")
-        
-        out = np.zeros(self.num_rows)
-        if self.intern_represent == 'CSR':
-            for i in range(self.num_rows):
-                start, end = self.rows[i], self.rows[i + 1]
-                slLen = end - start
-                vals, inds = self.v[start:end], self.cols[start:end]
-                for j in range(slLen):
-                    out[i] += vals[j] * vector[inds[j]]
-        elif self.intern_represent == 'CSC':
-            for i in range(self.num_cols):
-                start, end = self.cols[i], self.cols[i + 1]
-                slLen = end - start
-                vals, inds = self.v[start:end], self.rows[start:end]
-                vecVal = vector[i]
-                for j in range(slLen):
-                    out[inds[j]] += vals[j] * vecVal
-        else:
-            raise ValueError("Unrecognized internal representation for vector multiplication.")
-        return out
- 
     def multiply(self, vector):
         if len(vector.shape) != 1:
             raise ValueError(f"The input to vector multiplication is not a vector: {vector}")
