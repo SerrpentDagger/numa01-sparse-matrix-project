@@ -27,7 +27,7 @@ def randmatrix(approximate_sparsity, num_rows, num_cols):
     for i in range(num_rows):
         for j in range(num_cols):
             num = random.random()
-            if num < approximate_sparsity:
+            if num > approximate_sparsity:
                 matrix[i,j] = random.randint(1,1000000)
     return matrix
 
