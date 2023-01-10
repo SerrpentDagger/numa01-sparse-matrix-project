@@ -2,32 +2,144 @@
 
 import copy
 import numpy as np
+import random
+
+def randmatrix(approximate_sparsity, num_rows, num_cols):
+    """
+    
+
+    Parameters
+    ----------
+    approximate_sparsity : integer
+        Generates the expected ratio of zeros in relation to other values.
+    num_rows : integer
+        The number of rows in the randomly generated matrix.
+    num_cols : integer
+        The number of columns in the randomly generated matrix.
+
+    Returns
+    -------
+    matrix : np.array
+        A matrix is a matrix...
+
+    """
+    matrix = np.zeros(shape=[num_rows, num_cols])
+    for i in range(num_rows):
+        for j in range(num_cols):
+            num = random.random()
+            if num > approximate_sparsity:
+                matrix[i,j] = random.randint(1,1000000)
+    return matrix
 
 # These three functions are used heavily in the switch method,
 # and are hopefully useful for the addition method as well
 
 def decompress(array, dimension):
-    # dimension should be num_rows if it's the rows array, and num_cols if it's the cols array
+    """
+    
+
+    Parameters
+    ----------
+    array : np.array
+        An array of numbers that are non-decreasing.
+    dimension : integer
+        The number of rows or the number of columns, depending on which array is used.
+
+    Returns
+    -------
+    np.array
+        A decompressed array.
+
+    """
     return np.repeat(np.arange(dimension), np.diff(array))
 
 def compress(array, dimension, number_of_nonzero):
+    """
+    
+
+    Parameters
+    ----------
+    array : np.array
+        An array of numbers that are non-decreasing.
+    dimension : integer
+        The number of rows or the number of columns, depending on which array is used.
+    number_of_nonzero : integer
+        The number of non-zero elements.
+
+    Returns
+    -------
+    np.array
+        A compressed array.
+
+    """
     # might replace this (and the other functions) with another version if I find something that works quicker
     values, indices = np.unique(array, return_index=True)
     return np.repeat([*indices, number_of_nonzero], np.diff([-1, *values, dimension]))
 
 def reorder(first_indices, second_indices, values):
+    """
+    
+
+    Parameters
+    ----------
+    first_indices : np.array
+        An array.
+    second_indices : np.array
+        Another array.
+    values : np.array
+        Yet another array.
+
+    Returns
+    -------
+    np.array
+        Reordered version of first_indices.
+    np.array
+        Reordered version of second_indices.
+    np.array
+        Reordered version of values.
+
+    """
     # reorders all three lists by first_indices, with second_indices as a tie-breaker
     new_order = np.lexsort((second_indices, first_indices))
     return first_indices[new_order], second_indices[new_order], values[new_order]
 
 # Helps organize the print log.
 def prnt(text):
+    """
+    
+
+    Parameters
+    ----------
+    text : string
+        Outputs a title for test cases.
+
+    Returns
+    -------
+    None.
+
+    """
     print()
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~", text)
+
 
 class SparseMatrix:
     
     def __init__(self, matrix, tol = 10e-8):
+        """
+        
+
+        Parameters
+        ----------
+        matrix : np.array
+            A matrix is a matrix...
+        tol : integer
+            The value below which the data will be considered 0. The default is 10e-8.
+
+        Returns
+        -------
+        None.
+
+        """
         self.intern_represent = 'CSR'
         self.tol = tol
         
@@ -52,9 +164,31 @@ class SparseMatrix:
         
     @staticmethod
     def toeplitz(n):
+        """
+        
+
+        Parameters
+        ----------
+        n : integer
+            The number of rows.
+
+        Raises
+        ------
+        ValueError
+            This error is raised when n is not positive.
+
+        Returns
+        -------
+        toe : np.array
+            A toeplitz matrix, i.e. a diagonal-constant matrix.
+
+        """
         if n < 0:
             raise ValueError("The order of the Toeplitz matrix must be at least 0.")
         
+        if not isinstance(n, int):
+            raise TypeError("The order must be an integer.")
+
         toe = SparseMatrix(np.array([[]]))
         toe.num_rows = n
         toe.num_cols = n
@@ -86,6 +220,22 @@ class SparseMatrix:
         return toe
     
     def switch(self, new_represent):
+        """
+        
+
+        Parameters
+        ----------
+        new_represent : string
+            The representation to convert to. CSR -> CSC.
+
+        Returns
+        -------
+        None.
+
+        """
+        if new_represent != 'CSR' and new_represent != 'CSC':
+            raise ValueError("Representation not supported.")
+
         if self.intern_represent == 'CSR' and new_represent == 'CSC':
             self.rows = decompress(self.rows, self.num_rows)
             self.cols, self.rows, self.v = reorder(self.cols, self.rows, self.v)
@@ -99,8 +249,34 @@ class SparseMatrix:
         self.intern_represent = new_represent
         
     def change(self, i, j, value):
+        """
+        
+
+        Parameters
+        ----------
+        i : index
+            Input index representing rows.
+        j : index
+            Input index representing columns.
+        value : index
+            Input index representing a value.
+
+        Raises
+        ------
+        IndexError
+            This error is raised when the position is out of bounds.
+
+        Returns
+        -------
+        None.
+
+        """
         if i >= self.num_rows or j >= self.num_cols:
-            raise IndexError("position out of bounds")
+            raise IndexError("Position out of bounds.")
+        if i < 0 or j < 0:
+            raise IndexError("The coordinates of the position cannot be negative.")
+        if not isinstance(i, int) or not isinstance(j, int):
+            raise IndexError("Both indices must be integers.")
 
         nonZero = abs(value) >= self.tol
         if self.intern_represent == 'CSR':
@@ -138,6 +314,25 @@ class SparseMatrix:
                 
                 
     def equals(self, other):
+        """
+        
+
+        Parameters
+        ----------
+        other : SparseMatrix
+            A sparse matrix different from the self one.
+
+        Raises
+        ------
+        ValueError
+            This error is raised when something other than a sparse matrix is involved.
+
+        Returns
+        -------
+        int
+            It is an integer.
+
+        """
 		
         if isinstance(other, SparseMatrix):
             new = copy.copy(self)
@@ -153,6 +348,26 @@ class SparseMatrix:
 
 
     def add(self, other):
+        """
+        
+
+        Parameters
+        ----------
+        other : SparseMatrix
+            A sparse matrix different from the self one.
+
+        Raises
+        ------
+        ValueError
+            This error is raised when other is not a sparse matrix, 
+            or when the dimensions are invalid.
+
+        Returns
+        -------
+        Sum : SparseMatrix
+            The output is a matrix that is the result of matrix addition.
+
+        """
         
         if not isinstance(other, SparseMatrix):
             raise ValueError("other must be of type SparseMatrix!")
@@ -216,6 +431,26 @@ class SparseMatrix:
     
 
     def multiply(self, vector):
+        """
+        
+
+        Parameters
+        ----------
+        vector : np.array
+            A vector consists of a 1-dimensional numpy array.
+
+        Raises
+        ------
+        ValueError
+            This error is raised when the input to vector multiplication isn't a vector, 
+            or when the input vector doesn't match the matrix for multiplication.
+
+        Returns
+        -------
+        out : np.array
+            The output vector resulting from the vector multiplication.
+
+        """
         if len(vector.shape) != 1:
             raise ValueError(f"The input to vector multiplication is not a vector: {vector}")
         vLen = vector.shape[0]
@@ -243,6 +478,14 @@ class SparseMatrix:
         return out
     
     def describe(self):
+        """
+        
+
+        Returns
+        -------
+        None.
+
+        """
         print('==== DESCRIPTION ====')
         print('intern_represent -', self.intern_represent)
         print('V (value) -', self.v)
@@ -254,6 +497,14 @@ class SparseMatrix:
         print('=====================')
         
     def show(self):
+        """
+        
+
+        Returns
+        -------
+        None.
+
+        """
         Sum = copy.copy(self)
 
         if Sum.intern_represent == 'CSR':
@@ -366,7 +617,7 @@ spMat3.add(spMat4).describe()
 print("Expected output")
 SparseMatrix(matrix3 + matrix4).describe()
 
-prnt("EMTPY ADDITION")
+prnt("EMPTY ADDITION")
 matrix5 = np.array([[0, 0, 0],
                     [0, 0, 0],
                     [0, 0, 0]])
@@ -387,7 +638,7 @@ toe = SparseMatrix.toeplitz(0)
 toe.describe()
 SparseMatrix.toeplitz(4).add(SparseMatrix.toeplitz(4)).describe()
 
-prnt("TASK 10")
+prnt("BIGGER TOEPLITZ")
 toe = SparseMatrix.toeplitz(10)
 toe.describe()
 toe = SparseMatrix.toeplitz(100)
@@ -395,3 +646,8 @@ toe = SparseMatrix.toeplitz(10000)
 toe.describe()
 
 prnt("PERFORMANCE")
+
+toe = SparseMatrix.toeplitz(3)
+toe.change(1,0,"nail")
+toe.show()
+toe.describe()
