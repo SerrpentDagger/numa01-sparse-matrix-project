@@ -241,6 +241,20 @@ class SparseMatrix:
         print('Number of nonzero values -', self.number_of_nonzero)
         print('=====================')
         
+    def show(self):
+        Sum = copy.copy(self)
+
+        if Sum.intern_represent == 'CSR':
+            Sum.rows = decompress(Sum.rows, Sum.num_rows)
+        else:
+            Sum.cols = decompress(Sum.cols, Sum.num_cols)
+            Sum.rows, Sum.cols, Sum.v = reorder(Sum.rows, Sum.cols, Sum.v)
+
+        result = np.zeros((Sum.num_rows, Sum.num_cols))
+        for i in range(Sum.number_of_nonzero):
+            result[Sum.rows[i], Sum.cols[i]]=Sum.v[i]
+        print(result)
+        
 
 prnt("EXAMPLE")
 
@@ -252,7 +266,10 @@ vector = np.array([5, 2, 7, 10, 6, 3])
 
 sparse_matrix = SparseMatrix(matrix, tol = 10**-5)
 sparse_matrix.describe()
-
+sparse_matrix.show()
+sparse_matrix.switch('CSC')
+sparse_matrix.show()
+sparse_matrix.switch('CSR')
 
 prnt("SOME ARRAY EXAMPLES")
 
