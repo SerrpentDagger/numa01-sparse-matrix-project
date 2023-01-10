@@ -111,7 +111,7 @@ def prnt(text):
 
     Parameters
     ----------
-    text : text
+    text : string
         Outputs a title for test cases.
 
     Returns
