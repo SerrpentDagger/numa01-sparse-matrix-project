@@ -30,6 +30,21 @@ def prnt(text):
 class SparseMatrix:
     
     def __init__(self, matrix, tol = 10e-8):
+        """
+        
+
+        Parameters
+        ----------
+        matrix : matrix
+            A matrix is a matrix...
+        tol : tolerance
+            The value below which the data will be considered 0. The default is 10e-8.
+
+        Returns
+        -------
+        None.
+
+        """
         self.intern_represent = 'CSR'
         self.tol = tol
         
@@ -54,6 +69,25 @@ class SparseMatrix:
         
     @staticmethod
     def toeplitz(n):
+        """
+        
+
+        Parameters
+        ----------
+        n : integer
+            The number of rows.
+
+        Raises
+        ------
+        ValueError
+            This error is raised when n is not positive.
+
+        Returns
+        -------
+        toe : matrix
+            A toeplitz matrix, i.e. a diagonal-constant matrix.
+
+        """
         if n < 0:
             raise ValueError("The order of the Toeplitz matrix must be at least 0.")
         
@@ -88,6 +122,19 @@ class SparseMatrix:
         return toe
     
     def switch(self, new_represent):
+        """
+        
+
+        Parameters
+        ----------
+        new_represent : string
+            The representation to convert to. CSR -> CSC.
+
+        Returns
+        -------
+        None.
+
+        """
         if self.intern_represent == 'CSR' and new_represent == 'CSC':
             self.rows = decompress(self.rows, self.num_rows)
             self.cols, self.rows, self.v = reorder(self.cols, self.rows, self.v)
@@ -140,6 +187,25 @@ class SparseMatrix:
                 
                 
     def equals(self, other):
+        """
+        
+
+        Parameters
+        ----------
+        other : SparseMatrix
+            A sparse matrix different from the self one.
+
+        Raises
+        ------
+        ValueError
+            This error is raised when something other than a sparse matrix is involved.
+
+        Returns
+        -------
+        int
+            It is an integer.
+
+        """
 		
         if isinstance(other, SparseMatrix):
             new = copy.copy(self)
@@ -155,6 +221,26 @@ class SparseMatrix:
 
 
     def add(self, other):
+        """
+        
+
+        Parameters
+        ----------
+        other : SparseMatrix
+            A sparse matrix different from the self one.
+
+        Raises
+        ------
+        ValueError
+            This error is raised when other is not a sparse matrix, 
+            or when the dimensions are invalid.
+
+        Returns
+        -------
+        Sum : SparseMatrix
+            The sum is a sum.
+
+        """
         
         if not isinstance(other, SparseMatrix):
             raise ValueError("other must be of type SparseMatrix!")
@@ -218,6 +304,26 @@ class SparseMatrix:
     
 
     def multiply(self, vector):
+        """
+        
+
+        Parameters
+        ----------
+        vector : np.array
+            A vector consists of a 1-dimensional numpy array.
+
+        Raises
+        ------
+        ValueError
+            This error is raised when the input to vector multiplication isn't a vector, 
+            or when the input vector doesn't match the matrix for multiplication.
+
+        Returns
+        -------
+        out : np.array
+            The output vector resulting from the vector multiplication.
+
+        """
         if len(vector.shape) != 1:
             raise ValueError(f"The input to vector multiplication is not a vector: {vector}")
         vLen = vector.shape[0]
@@ -245,6 +351,14 @@ class SparseMatrix:
         return out
     
     def describe(self):
+        """
+        
+
+        Returns
+        -------
+        None.
+
+        """
         print('==== DESCRIPTION ====')
         print('intern_represent -', self.intern_represent)
         print('V (value) -', self.v)
@@ -256,6 +370,14 @@ class SparseMatrix:
         print('=====================')
         
     def show(self):
+        """
+        
+
+        Returns
+        -------
+        None.
+
+        """
         Sum = copy.copy(self)
 
         if Sum.intern_represent == 'CSR':
