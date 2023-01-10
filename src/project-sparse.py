@@ -30,7 +30,6 @@ def prnt(text):
 class SparseMatrix:
     
     def __init__(self, matrix, tol = 10**-8):
-        self.matrix = matrix
         self.intern_represent = 'CSR'
         
         matrix[np.abs(matrix) < tol] = 0
@@ -54,7 +53,37 @@ class SparseMatrix:
         
     @staticmethod
     def toeplitz(n):
-        pass
+        if n < 0:
+            raise ValueError("The order of the Toeplitz matrix must be at least 0.")
+        
+        toe = SparseMatrix(np.array([[]]))
+        toe.num_rows = n
+        toe.num_cols = n
+        
+        toe.number_of_nonzero = 3*n - 2 if n > 0 else 0
+        toe.v = np.array(([2, -1, -1] * n)[:-2])
+        
+        ind = np.array([0, 1, 0])
+        
+        toe.cols = []
+        for i in range(n):
+            toe.cols.extend(ind)
+            ind += 1
+        toe.cols = toe.cols[:-2]
+        toe.cols = np.array(toe.cols)
+        toe.rows = []
+        if n == 0:
+            return toe
+        if n == 1:
+            toe.rows = [0, 1]
+            return toe
+        
+        toe.rows = [0, 2]
+        toe.rows += [i*3 - 1 for i in range(2, n)]
+        toe.rows += [toe.number_of_nonzero]
+        toe.rows = np.array(toe.rows)
+        
+        return toe
     
     def switch(self, new_represent):
         if self.intern_represent == 'CSR' and new_represent == 'CSC':
@@ -281,5 +310,23 @@ print("Sum of matrices")
 (sparse_matrix.add(sparse_matrix2)).describe()
 print("Expected output")
 sparse_matrix3.describe()
+
+prnt("TOEPLITZ")
+toe = SparseMatrix.toeplitz(4)
+toe.describe()
+toe = SparseMatrix.toeplitz(2)
+toe.describe()
+toe = SparseMatrix.toeplitz(1)
+toe.describe()
+toe = SparseMatrix.toeplitz(0)
+toe.describe()
+
+prnt("TASK 10")
+toe = SparseMatrix.toeplitz(10)
+toe.describe()
+toe = SparseMatrix.toeplitz(100)
+toe = SparseMatrix.toeplitz(10000)
+toe.describe()
+
 
 prnt("PERFORMANCE")
