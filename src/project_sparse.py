@@ -6,6 +6,24 @@ import numpy as np
 import random
 
 def randmatrix(approximate_sparsity, num_rows, num_cols):
+    """
+    
+
+    Parameters
+    ----------
+    approximate_sparsity : integer
+        Generates the expected ratio of zeros in relation to other values.
+    num_rows : integer
+        The number of rows in the randomly generated matrix.
+    num_cols : integer
+        The number of columns in the randomly generated matrix.
+
+    Returns
+    -------
+    matrix : matrix
+        A matrix is a matrix...
+
+    """
     matrix = np.zeros(shape=[num_rows, num_cols])
     for i in range(num_rows):
         for j in range(num_cols):
@@ -18,23 +36,92 @@ def randmatrix(approximate_sparsity, num_rows, num_cols):
 # and are hopefully useful for the addition method as well
 
 def decompress(array, dimension):
-    # dimension should be num_rows if it's the rows array, and num_cols if it's the cols array
+    """
+    
+
+    Parameters
+    ----------
+    array : np.array
+        An array of numbers that are non-decreasing.
+    dimension : integer
+        The number of rows or the number of columns, depending on which array is used.
+
+    Returns
+    -------
+    np.array
+        A decompressed array.
+
+    """
     return np.repeat(np.arange(dimension), np.diff(array))
 
 def compress(array, dimension, number_of_nonzero):
+    """
+    
+
+    Parameters
+    ----------
+    array : np.array
+        An array of numbers that are non-decreasing.
+    dimension : integer
+        The number of rows or the number of columns, depending on which array is used.
+    number_of_nonzero : integer
+        The number of non-zero elements.
+
+    Returns
+    -------
+    np.array
+        A compressed array.
+
+    """
     # might replace this (and the other functions) with another version if I find something that works quicker
     values, indices = np.unique(array, return_index=True)
     return np.repeat([*indices, number_of_nonzero], np.diff([-1, *values, dimension]))
 
 def reorder(first_indices, second_indices, values):
+    """
+    
+
+    Parameters
+    ----------
+    first_indices : np.array
+        An array.
+    second_indices : np.array
+        Another array.
+    values : np.array
+        Yet another array.
+
+    Returns
+    -------
+    np.array
+        Reordered version of first_indices.
+    np.array
+        Reordered version of second_indices.
+    np.array
+        Reordered version of values.
+
+    """
     # reorders all three lists by first_indices, with second_indices as a tie-breaker
     new_order = np.lexsort((second_indices, first_indices))
     return first_indices[new_order], second_indices[new_order], values[new_order]
 
 # Helps organize the print log.
 def prnt(text):
+    """
+    
+
+    Parameters
+    ----------
+    text : text
+        Outputs a title for test cases.
+
+    Returns
+    -------
+    None.
+
+    """
     print()
     print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~", text)
+
 
 class SparseMatrix:
     
@@ -521,7 +608,7 @@ spMat3.add(spMat4).describe()
 print("Expected output")
 SparseMatrix(matrix3 + matrix4).describe()
 
-prnt("EMTPY ADDITION")
+prnt("EMPTY ADDITION")
 matrix5 = np.array([[0, 0, 0],
                     [0, 0, 0],
                     [0, 0, 0]])
@@ -542,7 +629,7 @@ toe = SparseMatrix.toeplitz(0)
 toe.describe()
 SparseMatrix.toeplitz(4).add(SparseMatrix.toeplitz(4)).describe()
 
-prnt("TASK 10")
+prnt("BIGGER TOEPLITZ")
 toe = SparseMatrix.toeplitz(10)
 toe.describe()
 toe = SparseMatrix.toeplitz(100)
