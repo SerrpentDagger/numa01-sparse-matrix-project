@@ -327,8 +327,8 @@ class SparseMatrix:
 
         Returns
         -------
-        int
-            It is an integer.
+        boolean
+            Whether or not the two SparseMatrix are equal.
 
         """
 		
@@ -337,12 +337,11 @@ class SparseMatrix:
             if self.intern_represent != other.intern_represent:
                 new.switch(other.intern_represent)
 
-            if np.sum(new != other) == 0:
-                return 1
-            else:
-                return 0
+            return new.number_of_nonzero == other.number_of_nonzero and \
+                new.num_rows == other.num_rows and new.num_cols == other.num_cols and \
+                (new.v == other.v).all() and (new.cols == other.cols).all() and (new.rows == other.rows).all()
         else:
-            raise ValueError("Summand not of type SparseMatrix!")
+            raise ValueError("Other for equals comparison is not of type SparseMatrix!")
 
 
     def add(self, other):
