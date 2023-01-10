@@ -321,6 +321,7 @@ toe = SparseMatrix.toeplitz(1)
 toe.describe()
 toe = SparseMatrix.toeplitz(0)
 toe.describe()
+SparseMatrix.toeplitz(4).add(SparseMatrix.toeplitz(4)).describe()
 
 prnt("TASK 10")
 toe = SparseMatrix.toeplitz(10)
