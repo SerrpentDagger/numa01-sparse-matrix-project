@@ -187,6 +187,9 @@ class SparseMatrix:
         if n < 0:
             raise ValueError("The order of the Toeplitz matrix must be at least 0.")
         
+        if not isinstance(n, int):
+            raise TypeError("The order must be an integer.")
+
         toe = SparseMatrix(np.array([[]]))
         toe.num_rows = n
         toe.num_cols = n
@@ -231,6 +234,9 @@ class SparseMatrix:
         None.
 
         """
+        if new_represent != 'CSR' and new_represent != 'CSC':
+            raise ValueError("Representation not supported.")
+
         if self.intern_represent == 'CSR' and new_represent == 'CSC':
             self.rows = decompress(self.rows, self.num_rows)
             self.cols, self.rows, self.v = reorder(self.cols, self.rows, self.v)
@@ -267,7 +273,11 @@ class SparseMatrix:
 
         """
         if i >= self.num_rows or j >= self.num_cols:
-            raise IndexError("position out of bounds")
+            raise IndexError("Position out of bounds.")
+        if i < 0 or j < 0:
+            raise IndexError("The coordinates of the position cannot be negative.")
+        if not isinstance(i, int) or not isinstance(j, int):
+            raise IndexError("Both indices must be integers.")
 
         nonZero = abs(value) >= self.tol
         if self.intern_represent == 'CSR':
@@ -637,3 +647,8 @@ toe = SparseMatrix.toeplitz(10000)
 toe.describe()
 
 prnt("PERFORMANCE")
+
+toe = SparseMatrix.toeplitz(3)
+toe.change(1,0,"nail")
+toe.show()
+toe.describe()
