@@ -20,7 +20,7 @@ def randmatrix(approximate_sparsity, num_rows, num_cols):
 
     Returns
     -------
-    matrix : matrix
+    matrix : np.array
         A matrix is a matrix...
 
     """
@@ -131,9 +131,9 @@ class SparseMatrix:
 
         Parameters
         ----------
-        matrix : matrix
+        matrix : np.array
             A matrix is a matrix...
-        tol : tolerance
+        tol : integer
             The value below which the data will be considered 0. The default is 10e-8.
 
         Returns
@@ -180,7 +180,7 @@ class SparseMatrix:
 
         Returns
         -------
-        toe : matrix
+        toe : np.array
             A toeplitz matrix, i.e. a diagonal-constant matrix.
 
         """
