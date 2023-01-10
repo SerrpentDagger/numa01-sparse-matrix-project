@@ -50,6 +50,10 @@ class SparseMatrix:
         
         self.num_rows = matrix.shape[0]
         self.num_cols = matrix.shape[1]
+        
+    @staticmethod
+    def toeplitz(n):
+        pass
     
     def switch(self, new_represent):
         if self.intern_represent == 'CSR' and new_represent == 'CSC':
