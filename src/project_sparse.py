@@ -356,7 +356,7 @@ class SparseMatrix:
         Returns
         -------
         Sum : SparseMatrix
-            The sum is a sum.
+            The output is a matrix that is the result of matrix addition.
 
         """
         
