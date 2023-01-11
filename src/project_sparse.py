@@ -42,7 +42,7 @@ def compress(array, dimension, number_of_nonzero):
 
     """
     values, indices = np.unique(array, return_index=True)
-    return np.repeat([*indices, number_of_nonzero], np.diff([-1, *values, dimension]))
+    return np.repeat(np.concatenate((indices, [number_of_nonzero])), np.diff(np.concatenate(([-1], values, [dimension]))))
 
 def reorder(first_indices, second_indices, values):
     """
@@ -384,7 +384,7 @@ class SparseMatrix:
                     Sum.v = np.delete(Sum.v, i)
                     coords = np.delete(coords, i, axis=0)
                 i -= 1
-                
+
         Sum.tol = self.tol
         Sum.number_of_nonzero = len(coords)        
         if Sum.intern_represent == 'CSC':
