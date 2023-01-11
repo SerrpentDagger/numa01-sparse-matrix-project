@@ -2,41 +2,10 @@
 
 import copy
 import numpy as np
-import random
-
-def randmatrix(approximate_sparsity, num_rows, num_cols):
-    """
-    
-
-    Parameters
-    ----------
-    approximate_sparsity : integer
-        Generates the expected ratio of zeros in relation to other values.
-    num_rows : integer
-        The number of rows in the randomly generated matrix.
-    num_cols : integer
-        The number of columns in the randomly generated matrix.
-
-    Returns
-    -------
-    matrix : np.array
-        A matrix is a matrix...
-
-    """
-    matrix = np.zeros(shape=[num_rows, num_cols])
-    for i in range(num_rows):
-        for j in range(num_cols):
-            num = random.random()
-            if num > approximate_sparsity:
-                matrix[i,j] = random.randint(1,1000000)
-    return matrix
-
-# These three functions are used heavily in the switch method,
-# and are hopefully useful for the addition method as well
 
 def decompress(array, dimension):
     """
-    
+    Decompresses an array of numbers.
 
     Parameters
     ----------
@@ -55,7 +24,7 @@ def decompress(array, dimension):
 
 def compress(array, dimension, number_of_nonzero):
     """
-    
+    Compresses an array of numbers.
 
     Parameters
     ----------
@@ -72,13 +41,12 @@ def compress(array, dimension, number_of_nonzero):
         A compressed array.
 
     """
-    # might replace this (and the other functions) with another version if I find something that works quicker
     values, indices = np.unique(array, return_index=True)
     return np.repeat([*indices, number_of_nonzero], np.diff([-1, *values, dimension]))
 
 def reorder(first_indices, second_indices, values):
     """
-    
+    Reorders three arrays based on first_indices, with second_indices as a tie-breaker.
 
     Parameters
     ----------
@@ -106,12 +74,12 @@ def reorder(first_indices, second_indices, values):
 # Helps organize the print log.
 def prnt(text):
     """
-    
+    Outputs a title string for test cases.
 
     Parameters
     ----------
     text : string
-        Outputs a title for test cases.
+        The title for the test case.
 
     Returns
     -------
@@ -126,12 +94,12 @@ class SparseMatrix:
     
     def __init__(self, matrix, tol = 10e-8):
         """
-        
+        Initialises the sparse matrix.
 
         Parameters
         ----------
         matrix : np.array
-            A matrix is a matrix...
+            A dense matrix.
         tol : integer
             The value below which the data will be considered 0. The default is 10e-8.
 
@@ -153,7 +121,7 @@ class SparseMatrix:
             self.v.extend(r[nonzero_cols])
             self.rows.append(len(self.cols))
 
-        self.v, self.cols, self.rows = np.array(self.v), np.array(self.cols), np.array(self.rows)    
+        self.v, self.cols, self.rows = np.array(self.v), np.array(self.cols, dtype=int), np.array(self.rows, dtype=int)  
        
         self.number_of_nonzero = len(self.cols)
         
@@ -163,7 +131,7 @@ class SparseMatrix:
     @staticmethod
     def toeplitz(n):
         """
-        
+        Generates a Toeplitz matrix.
 
         Parameters
         ----------
@@ -178,7 +146,7 @@ class SparseMatrix:
         Returns
         -------
         toe : np.array
-            A toeplitz matrix, i.e. a diagonal-constant matrix.
+            A Toeplitz matrix, i.e. a diagonal-constant matrix.
 
         """
         if n < 0:
@@ -219,12 +187,12 @@ class SparseMatrix:
     
     def switch(self, new_represent):
         """
-        
+        Switches the representation of the matrix.
 
         Parameters
         ----------
         new_represent : string
-            The representation to convert to. CSR -> CSC.
+            The representation to convert to.
 
         Returns
         -------
@@ -248,16 +216,16 @@ class SparseMatrix:
         
     def change(self, i, j, value):
         """
-        
+        Changes the value of a specified element of the matrix.
 
         Parameters
         ----------
-        i : index
+        i : integer
             Input index representing rows.
-        j : index
+        j : integer
             Input index representing columns.
-        value : index
-            Input index representing a value.
+        value : number
+            Input representing a value.
 
         Raises
         ------
@@ -279,9 +247,7 @@ class SparseMatrix:
         nonZero = abs(value) >= self.tol
         if self.intern_represent == 'CSR':
             index = np.searchsorted(self.cols[self.rows[i]:self.rows[i+1]], j) + self.rows[i]
-            # The reason for the try-except is that self.cols[index]
-            # doesn't exist if index == self.number_of_nonzero
-            if j < len(self.cols) and self.cols[index] == j and index != self.rows[i+1]:
+            if index < self.number_of_nonzero and self.cols[index] == j and index != self.rows[i+1]:
                 if nonZero:
                     self.v[index] = value
                 else:
@@ -296,7 +262,7 @@ class SparseMatrix:
                 self.number_of_nonzero += 1
         elif self.intern_represent == 'CSC':
             index = np.searchsorted(self.rows[self.cols[j]:self.cols[j+1]], i) + self.cols[j]
-            if i < len(self.rows) and self.rows[index] == i and index != self.cols[j+1]:
+            if index < self.number_of_nonzero and self.rows[index] == i and index != self.cols[j+1]:
                 if nonZero:
                     self.v[index] = value
                 else:
@@ -313,7 +279,7 @@ class SparseMatrix:
                 
     def equals(self, other):
         """
-        
+        Checks whether two matrices are equal to each other.
 
         Parameters
         ----------
@@ -346,12 +312,12 @@ class SparseMatrix:
 
     def add(self, other):
         """
-        
+        Adds two matrices together.
 
         Parameters
         ----------
         other : SparseMatrix
-            A sparse matrix different from the self one.
+            A sparse matrix that will be added.
 
         Raises
         ------
@@ -418,9 +384,11 @@ class SparseMatrix:
                     Sum.v = np.delete(Sum.v, i)
                     coords = np.delete(coords, i, axis=0)
                 i -= 1
-
+                
+        Sum.tol = self.tol
         Sum.number_of_nonzero = len(coords)        
         if Sum.intern_represent == 'CSC':
+            Sum.cols, Sum.rows, Sum.v = reorder(Sum.cols, Sum.rows, Sum.v)
             Sum.cols = compress(Sum.cols, Sum.num_cols, Sum.number_of_nonzero)
         else:
             Sum.rows = compress(Sum.rows, Sum.num_rows, Sum.number_of_nonzero)
@@ -429,12 +397,12 @@ class SparseMatrix:
 
     def multiply(self, vector):
         """
-        
+        Multiplies a matrix by a column vector.
 
         Parameters
         ----------
         vector : np.array
-            A vector consists of a 1-dimensional numpy array.
+            The vector is a 1-dimensional numpy array.
 
         Raises
         ------
@@ -476,7 +444,7 @@ class SparseMatrix:
     
     def describe(self):
         """
-        
+        Prints a description of the matrix.
 
         Returns
         -------
@@ -495,7 +463,7 @@ class SparseMatrix:
         
     def show(self):
         """
-        
+        Creates and shows a dense matrix.
 
         Returns
         -------
